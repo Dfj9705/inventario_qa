@@ -16,9 +16,10 @@ class ProductoController extends Controller
             'estado' => ['sometimes', 'boolean'],
         ]);
 
-        $query = Producto::with(['existencias.almacen'])->orderByDesc('created_at');
+        $query = Producto::with(['existencias.almacen'])
+            ->orderByDesc('created_at');
 
-        if (isset($validated['estado'])) {
+        if ($request->filled('estado')) {
             $query->where('estado', $validated['estado']);
         }
 
