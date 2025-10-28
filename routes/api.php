@@ -17,7 +17,9 @@ use App\Http\Controllers\MovimientoController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
+Route::get('/', function () {
+    return response()->json(['message' => 'API DE GESTION DE INVENTARIOS']);
+});
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);

@@ -12,6 +12,10 @@ class DemoSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        \App\Models\User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@demo.test',
+            'password' => bcrypt('secret123')
+        ]);
     }
 }
