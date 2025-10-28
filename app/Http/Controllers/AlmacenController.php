@@ -3,63 +3,46 @@
 namespace App\Http\Controllers;
 
 use App\Models\Almacen;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class AlmacenController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $almacenes = Almacen::with(['existencias.producto'])->orderBy('nombre')->get();
+
+        return response()->json($almacenes);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'nombre' => ['required', 'string', 'max:255'],
+            'ubicacion' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $almacen = Almacen::create($validated);
+
+        return response()->json($almacen, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, Almacen $almacen): JsonResponse
     {
-        //
+        $validated = $request->validate([
+            'nombre' => ['sometimes', 'string', 'max:255'],
+            'ubicacion' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $almacen->fill($validated)->save();
+
+        return response()->json($almacen);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Almacen $almacen)
+    public function destroy(Almacen $almacen): JsonResponse
     {
-        //
-    }
+        $almacen->delete();
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Almacen $almacen)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Almacen $almacen)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Almacen $almacen)
-    {
-        //
+        return response()->json(null, 204);
     }
 }

@@ -8,17 +8,32 @@ use Illuminate\Database\Eloquent\Model;
 class Movimiento extends Model
 {
     use HasFactory;
-    protected static function booted()
+    protected $fillable = [
+        'producto_id',
+        'almacen_id',
+        'tipo',
+        'cantidad',
+        'motivo',
+        'fecha',
+        'user_id',
+    ];
+
+    protected $casts = [
+        'fecha' => 'datetime',
+    ];
+
+    public function producto()
     {
-        static::created(function ($mov) {
-            $ex = Existencia::firstOrCreate([
-                'producto_id' => $mov->producto_id,
-                'almacen_id' => $mov->almacen_id,
-            ]);
-            $delta = $mov->tipo === 'IN' ? $mov->cantidad : -$mov->cantidad;
-            $ex->stock = max(0, $ex->stock + $delta);
-            $ex->save();
-        });
+        return $this->belongsTo(Producto::class);
     }
 
+    public function almacen()
+    {
+        return $this->belongsTo(Almacen::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
