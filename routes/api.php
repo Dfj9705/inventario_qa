@@ -27,7 +27,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('productos', ProductoController::class);
-    Route::apiResource('almacenes', AlmacenController::class)->only(['index', 'store', 'update', 'destroy']);
+    Route::apiResource('almacenes', AlmacenController::class)->only(['index', 'store', 'update', 'destroy'])->parameters(['almacenes' => 'almacen']);
     Route::get('stock', [ExistenciaController::class, 'index']);
     Route::apiResource('movimientos', MovimientoController::class)->only(['index', 'store', 'show']);
 });
