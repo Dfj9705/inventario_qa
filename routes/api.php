@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\AlmacenController;
+use App\Http\Controllers\ExistenciaController;
 use App\Http\Controllers\MovimientoController;
 
 /*
@@ -27,6 +28,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('productos', ProductoController::class);
     Route::apiResource('almacenes', AlmacenController::class)->only(['index', 'store', 'update', 'destroy']);
-    Route::get('stock', fn() => \App\Models\Existencia::with(['producto', 'almacen'])->get());
+    Route::get('stock', [ExistenciaController::class, 'index']);
     Route::apiResource('movimientos', MovimientoController::class)->only(['index', 'store', 'show']);
 });
