@@ -1,12 +1,39 @@
 pipeline {
   agent any
-  options { skipDefaultCheckout(true) }
-  triggers { githubPush() }
   environment {
-    SONAR_SCANNER_HOME = tool 'testsonar'   // Global Tool
+    COMPOSER_NO_INTERACTION = '1'
+    XDEBUG_MODE = 'coverage'
+    SONAR_SCANNER_HOME = tool 'SonarScanner'
   }
-
   stages {
+    stage('Checkout') { steps { checkout scm } }
+
+    // Deps (composer) -> bloque de arriba
+
+    stage('Preparar testing') {
+      when { branch 'qa' }
+      steps {
+        sh '''
+          cp -f .env.testing .env || true
+          php -r "file_exists('.env') || copy('.env.example','.env');"
+          php artisan key:generate || true
+          mkdir -p database && touch database/testing.sqlite || true
+          php artisan config:clear || true
+          php artisan migrate --force || true
+        '''
+      }
+    }
+
+    stage('Tests + Coverage') {
+      when { branch 'qa' }
+      steps {
+        sh '''
+          mkdir -p storage/coverage
+          ./vendor/bin/phpunit --coverage-clover storage/coverage/coverage.xml
+        '''
+      }
+    }
+
     stage('SonarQube') {
       when { branch 'qa' }
       steps {
@@ -19,6 +46,18 @@ pipeline {
               -Dsonar.exclusions=vendor/**,storage/**,node_modules/** \
               -Dsonar.php.coverage.reportPaths=storage/coverage/coverage.xml
           """
+        }
+      }
+    }
+
+    stage('Quality Gate') {
+      when { branch 'qa' }
+      steps {
+        script {
+          timeout(time: 10, unit: 'MINUTES') {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') error "Quality Gate FAILED: ${qg.status}"
+          }
         }
       }
     }
