@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'php:8.2-cli'
-      args '-u root'
-    }
-  }
+  agent any
   options { skipDefaultCheckout(true) }
   triggers { githubPush() }
   environment {
