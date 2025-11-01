@@ -6,7 +6,7 @@ pipeline {
     COMPOSER_NO_INTERACTION = '1'
     APP_ENV = 'testing'
     XDEBUG_MODE = 'coverage'
-    SONAR_SCANNER_HOME = tool 'SonarScanner'     // Nombre del tool en Jenkins
+    SONAR_SCANNER_HOME = tool 'testsonarjenkins'     // Nombre del tool en Jenkins
   }
 
   triggers { githubPush() } // el webhook de GitHub dispara el build
