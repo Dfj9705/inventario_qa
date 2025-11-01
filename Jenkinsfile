@@ -9,7 +9,6 @@ pipeline {
     COMPOSER_NO_INTERACTION = '1'
     XDEBUG_MODE = 'coverage'
     SONAR_SCANNER_HOME = tool 'SonarScanner'
-      
   }
   stages {
     stage('Checkout') { steps { checkout scm } }
