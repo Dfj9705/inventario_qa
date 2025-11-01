@@ -22,15 +22,14 @@ class ProductoControllerTest extends TestCase
 
         $response = $this->getJson('/api/productos?estado=1&per_page=2');
 
-        $response->assertOk()->assertJson(
-            fn(AssertableJson $json) => $json
-                ->has('data', 2)
-                ->where('per_page', 2)
-                ->etc()
+        $response->assertOk()->assertJson(fn (AssertableJson $json) => $json
+            ->has('data', 2)
+            ->where('meta.per_page', 2)
+            ->etc()
         );
 
         $this->assertTrue(collect($response->json('data'))
-            ->every(fn(array $producto) => (int) $producto['estado'] === 1));
+            ->every(fn (array $producto) => (int) $producto['estado'] === 1));
     }
 
     public function test_can_create_product(): void
