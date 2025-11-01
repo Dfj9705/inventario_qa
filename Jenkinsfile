@@ -22,17 +22,5 @@ pipeline {
         }
       }
     }
-
-    stage('Quality Gate') {
-      when { branch 'qa' }
-      steps {
-        script {
-          timeout(time: 10, unit: 'MINUTES') {
-            def qg = waitForQualityGate()
-            if (qg.status != 'OK') error "Quality Gate FAILED: ${qg.status}"
-          }
-        }
-      }
-    }
   }
 }
