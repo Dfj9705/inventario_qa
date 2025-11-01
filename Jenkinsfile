@@ -1,30 +1,30 @@
 pipeline {
   agent any
-  options { timestamps() }
+  options { timestamps(); ansiColor('xterm') }
 
   stages {
     stage('Debug') {
       steps {
-        echo "Rama detectada: ${env.BRANCH_NAME}"
-        sh 'php -v || echo "PHP no instalado en el agente"'
+        echo "BRANCH_NAME = ${env.BRANCH_NAME}"
+        script {
+          if (isUnix()) {
+            sh 'pwd && ls -la'
+          } else {
+            bat 'cd & dir'
+          }
+        }
       }
     }
 
-    stage('Tests QA') {
+    stage('Solo en QA') {
       when { branch 'qa' }
       steps {
-        echo "Ejecutando tests para QA..."
-        sh '''
-          php -r "echo 'Pruebas simuladas ejecutadas';"
-          # composer install --no-progress --prefer-dist
-          # php artisan test
-        '''
+        echo 'Este stage solo corre en la rama QA'
       }
     }
   }
 
   post {
-    success { echo 'Pipeline completado correctamente' }
-    failure { echo 'Falló el pipeline' }
+    success { echo 'Pipeline ejecutó stages correctamente.' }
   }
 }
