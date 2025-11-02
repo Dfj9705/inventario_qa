@@ -87,15 +87,17 @@ pipeline {
       when { branch 'qa' }
       steps {
         withSonarQubeEnv('TEST SONAR') {
-          bat """
-          "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" ^
-            -D"sonar.projectKey=PROYECTO-FINAL-QA" ^
-            -D"sonar.projectName=PROYECTO FINAL QA" ^
-            -D"sonar.token=sqp_e5c4b42ec49956f747a6f008bdb8755a18add0eb" ^
-            -D"sonar.sources=app,config,resources,routes" ^
-            -D"sonar.exclusions=vendor/**,storage/**,node_modules/**" ^
-            -D"sonar.php.coverage.reportPaths=storage/coverage/coverage.xml"
-          """
+            withCredentials([string(credentialsId: 'SONARKEY', variable: 'SONAR_TOKEN')]) {
+              bat """
+                    "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" ^
+                      -D"sonar.projectKey=PROYECTO-FINAL-QA" ^
+                      -D"sonar.projectName=PROYECTO FINAL QA" ^
+                      -D"sonar.sources=app,config,resources,routes" ^
+                      -D"sonar.exclusions=vendor/**,storage/**,node_modules/**" ^
+                      -D"sonar.php.coverage.reportPaths=storage/coverage/coverage.xml" ^
+                      -D"sonar.login=%SONAR_TOKEN%"
+                    """
+            }
         }
       }
     }
