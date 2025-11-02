@@ -3,7 +3,7 @@ pipeline {
   environment {
     COMPOSER_NO_INTERACTION = '1'
     XDEBUG_MODE = 'coverage'                 // si tienes Xdebug/PCOV para cobertura
-    SONAR_SCANNER_HOME = tool 'SonarScanner' // nombre en Global Tool
+    SONAR_SCANNER_HOME = tool 'TESTSONAR' // nombre en Global Tool
   }
 
   stages {
