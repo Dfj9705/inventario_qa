@@ -86,7 +86,7 @@ pipeline {
     stage('SonarQube') {
       when { branch 'qa' }
       steps {
-        withSonarQubeEnv('TESTSONAR') {
+        withSonarQubeEnv('TEST SONAR') {
           bat """
           "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" ^
             -Dsonar.projectKey=PROYECTO-FINAL-QA ^
