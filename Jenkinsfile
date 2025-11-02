@@ -109,7 +109,7 @@ pipeline {
     script {
       if (env.BRANCH_NAME == 'qa') {
         slackSend(
-          channel: '#ci-qa',
+          channel: '',
           color: 'good',
           message: """
 :white_check_mark: *QA PASÓ*
@@ -125,7 +125,7 @@ Ver: ${env.BUILD_URL}
     script {
       if (env.BRANCH_NAME == 'qa') {
         slackSend(
-          channel: '#ci-qa',
+          channel: '',
           color: 'danger',
           message: """
 :x: *QA FALLÓ*
@@ -141,7 +141,7 @@ Consola: ${env.BUILD_URL}console
     script {
       if (env.BRANCH_NAME == 'qa') {
         slackSend(
-          channel: '#ci-qa',
+          channel: '',
           color: '#e3b341',
           message: """
 :warning: *QA INESTABLE*
