@@ -3,7 +3,7 @@ pipeline {
   environment {
     COMPOSER_NO_INTERACTION = '1'
     XDEBUG_MODE = 'coverage'
-    SONAR_SCANNER_HOME = tool 'SonarScanner'
+    SONAR_SCANNER_HOME = tool 'TESTSONAR'
   }
 
   stages {
