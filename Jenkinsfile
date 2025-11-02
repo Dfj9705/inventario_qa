@@ -96,7 +96,7 @@ pipeline {
                   -D"sonar.sources=app,config,resources,routes" ^
                   -D"sonar.exclusions=vendor/**,storage/**,node_modules/**" ^
                   -D"sonar.php.coverage.reportPaths=storage/coverage/coverage.xml" ^
-                  -D"sonar.token=sqp_260537f629c1afafcb7a3e4fa156ece2eaaba5e8"
+                  -D"sonar.token=sqa_71106708bbc573d335477bcc05e125532b36aa6c"
                 """
             
         }
