@@ -3,7 +3,7 @@ pipeline {
   environment {
     COMPOSER_NO_INTERACTION = '1'
     XDEBUG_MODE = 'coverage'
-    SONAR_SCANNER_HOME = tool 'TEST SONAR'
+    SONAR_SCANNER_HOME = tool 'TESTSONAR'
   }
 
   stages {
@@ -86,7 +86,7 @@ pipeline {
     stage('SonarQube') {
       when { branch 'qa' }
       steps {
-        withSonarQubeEnv('TEST SONAR') {
+        withSonarQubeEnv('TESTSONAR') {
           bat """
           "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" ^
             -Dsonar.projectKey=PROYECTO-FINAL-QA ^
