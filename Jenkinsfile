@@ -29,44 +29,46 @@ pipeline {
     }
 
     stage('Preparar entorno de pruebas') {
-      when { branch 'qa' }
-      steps {
-        bat '''
-        rem -- .env de testing (si no existe, copia el example)
-        if exist ".env.testing" (
-          copy /Y .env.testing .env >NUL
-        ) else (
-          if not exist .env copy /Y .env.example .env >NUL
-        )
+        when { branch 'qa' }
+        steps {
+            bat '''
+            rem -- Copiar .env de testing o example
+            if exist ".env.testing" (
+            copy /Y .env.testing .env >NUL
+            ) else (
+            if not exist .env copy /Y .env.example .env >NUL
+            )
 
-        rem -- clave app
-        php artisan key:generate || exit /B 0
+            rem -- Forzar sqlite (por si .env.testing no lo trae)
+            powershell -Command "(Get-Content .env) -replace '^DB_CONNECTION=.*','DB_CONNECTION=sqlite' -replace '^DB_DATABASE=.*','DB_DATABASE=database/testing.sqlite' | Set-Content .env"
 
-        rem -- sqlite de pruebas
-        if not exist database mkdir database
-        if not exist database\\testing.sqlite type NUL > database\\testing.sqlite
+            rem -- sqlite file
+            if not exist database mkdir database
+            if not exist database\\testing.sqlite type NUL > database\\testing.sqlite
 
-        php artisan config:clear || exit /B 0
-        php artisan migrate --force || exit /B 0
-        '''
-      }
+            rem -- Generar clave y luego limpiar cache de config
+            php artisan key:generate --force
+            php artisan config:clear
+
+            rem -- (debug) mostrar si APP_KEY existe
+            php -r "echo 'APP_KEY='.getenv('APP_KEY').PHP_EOL;"
+            '''
+        }
     }
 
     stage('Tests + Coverage') {
-      when { branch 'qa' }
-      steps {
-        bat '''
-        if not exist storage\\coverage mkdir storage\\coverage
-
-        if exist vendor\\bin\\phpunit.bat (
-          vendor\\bin\\phpunit.bat --coverage-clover storage\\coverage\\coverage.xml
-        ) else (
-          php vendor\\phpunit\\phpunit\\phpunit --coverage-clover storage\\coverage\\coverage.xml
-        )
-        '''
-      }
+        when { branch 'qa' }
+        steps {
+            bat '''
+            if not exist storage\\coverage mkdir storage\\coverage
+            if exist vendor\\bin\\phpunit.bat (
+            vendor\\bin\\phpunit.bat --coverage-clover storage\\coverage\\coverage.xml
+            ) else (
+            php vendor\\phpunit\\phpunit\\phpunit --coverage-clover storage\\coverage\\coverage.xml
+            )
+            '''
+        }
     }
-
     stage('SonarQube') {
       when { branch 'qa' }
       steps {
