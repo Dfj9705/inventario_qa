@@ -91,7 +91,7 @@ pipeline {
           bat """
                 "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" ^
                   -D"sonar.projectKey=PQAFINAL" ^
-                  -D"sonar.host.url=host.docker.internal:9000" ^
+                  -D"sonar.host.url=http://localhost:9000" ^
                   -D"sonar.projectName=PQAFINAL" ^
                   -D"sonar.sources=app,config,resources,routes" ^
                   -D"sonar.exclusions=vendor/**,storage/**,node_modules/**" ^
