@@ -1,29 +1,36 @@
 pipeline {
-  agent {
-    docker {
-      image 'php:8.2-cli'
-      args '-u root'
-    }
-  }
+  agent any
   environment {
     COMPOSER_NO_INTERACTION = '1'
-    XDEBUG_MODE = 'coverage'
-    SONAR_SCANNER_HOME = tool 'SonarScanner'
+    XDEBUG_MODE = 'coverage'                 // si tienes Xdebug/PCOV para cobertura
+    SONAR_SCANNER_HOME = tool 'SonarScanner' // nombre en Global Tool
   }
+
   stages {
-    stage('Checkout') { steps { checkout scm } }
-    stage('Deps (composer)') {
+    stage('Checkout') {
+      steps { checkout scm }
+    }
+
+    stage('Instalar dependencias') {
       when { branch 'qa' }
       steps {
+        // Instala composer local si no existe y luego dependencias
         sh '''
-          which composer || (curl -sS https://getcomposer.org/installer | php && mv composer.phar /usr/local/bin/composer)
-          pecl install xdebug || true
-          docker-php-ext-enable xdebug || true
-          composer install --no-progress --prefer-dist
+          php -v
+          if ! command -v composer >/dev/null 2>&1; then
+            php -r "copy('https://getcomposer.org/installer','composer-setup.php');"
+            php composer-setup.php --install-dir=./ --filename=composer
+            rm -f composer-setup.php
+            export COMPOSER=./composer
+          else
+            export COMPOSER=$(command -v composer)
+          fi
+          $COMPOSER install --no-progress --prefer-dist
         '''
       }
     }
-    stage('Preparar testing') {
+
+    stage('Preparar entorno de pruebas') {
       when { branch 'qa' }
       steps {
         sh '''
@@ -31,14 +38,27 @@ pipeline {
           php -r "file_exists('.env') || copy('.env.example','.env');"
           php artisan key:generate || true
           mkdir -p database && touch database/testing.sqlite || true
+          php artisan config:clear || true
           php artisan migrate --force || true
         '''
       }
     }
+
     stage('Tests + Coverage') {
       when { branch 'qa' }
-      steps { sh './vendor/bin/phpunit --coverage-clover storage/coverage/coverage.xml' }
+      steps {
+        sh '''
+          mkdir -p storage/coverage
+          ./vendor/bin/phpunit --coverage-clover storage/coverage/coverage.xml
+        '''
+      }
+      post {
+        always {
+          junit allowEmptyResults: true, testResults: 'tests/**/junit*.xml'
+        }
+      }
     }
+
     stage('SonarQube') {
       when { branch 'qa' }
       steps {
@@ -54,6 +74,7 @@ pipeline {
         }
       }
     }
+
     stage('Quality Gate') {
       when { branch 'qa' }
       steps {
@@ -65,5 +86,10 @@ pipeline {
         }
       }
     }
+  }
+
+  post {
+    success { echo 'QA OK: listo para mergear a main.' }
+    failure { echo 'Fallo QA: revisar tests o quality gate.' }
   }
 }
