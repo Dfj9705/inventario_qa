@@ -104,55 +104,55 @@ pipeline {
     }
   }
 
-  post {
-      success {
-        when { branch 'qa' }
-        script {
-          slackSend(
-            channel: '',                  // o deja vacío para usar el default
-            color: 'good',
-            message: """
-                    :white_check_mark: *QA PASÓ*  
-                    *Job:* ${env.JOB_NAME}  
-                    *Build:* #${env.BUILD_NUMBER}  
-                    *Rama:* ${env.BRANCH_NAME}  
-                    *Autor:* ${env.CHANGE_AUTHOR ?: 'N/A'}  
-                    *Ver:* ${env.BUILD_URL}
-                    """.stripIndent()
-          )
-        }
+     post {
+  success {
+    script {
+      if (env.BRANCH_NAME == 'qa') {
+        slackSend(
+          channel: '#ci-qa',
+          color: 'good',
+          message: """
+:white_check_mark: *QA PASÓ*
+Job: ${env.JOB_NAME}  Build: #${env.BUILD_NUMBER}
+Rama: ${env.BRANCH_NAME}
+Ver: ${env.BUILD_URL}
+""".stripIndent()
+        )
       }
-      failure {
-        when { branch 'qa' }
-        script {
-          slackSend(
-            channel: '',
-            color: 'danger',
-            message: """
-                    :x: *QA FALLÓ*  
-                    *Job:* ${env.JOB_NAME}  
-                    *Build:* #${env.BUILD_NUMBER}  
-                    *Rama:* ${env.BRANCH_NAME}  
-                    *Revisa la consola:* ${env.BUILD_URL}console
-                    """.stripIndent()
-          )
-        }
+    }
+  }
+  failure {
+    script {
+      if (env.BRANCH_NAME == 'qa') {
+        slackSend(
+          channel: '#ci-qa',
+          color: 'danger',
+          message: """
+:x: *QA FALLÓ*
+Job: ${env.JOB_NAME}  Build: #${env.BUILD_NUMBER}
+Rama: ${env.BRANCH_NAME}
+Consola: ${env.BUILD_URL}console
+""".stripIndent()
+        )
       }
-      unstable {
-        when { branch 'qa' }
-        script {
-          slackSend(
-            channel: '',
-            color: '#e3b341', // amarillo
-            message: """
-                :warning: *QA INESTABLE*  
-                *Job:* ${env.JOB_NAME}  
-                *Build:* #${env.BUILD_NUMBER}  
-                *Rama:* ${env.BRANCH_NAME}  
-                *Detalles:* ${env.BUILD_URL}
-                """.stripIndent()
-          )
-        }
+    }
+  }
+  unstable {
+    script {
+      if (env.BRANCH_NAME == 'qa') {
+        slackSend(
+          channel: '#ci-qa',
+          color: '#e3b341',
+          message: """
+:warning: *QA INESTABLE*
+Job: ${env.JOB_NAME}  Build: #${env.BUILD_NUMBER}
+Rama: ${env.BRANCH_NAME}
+Detalles: ${env.BUILD_URL}
+""".stripIndent()
+        )
+      }
+    }
   }
 }
+
 }
