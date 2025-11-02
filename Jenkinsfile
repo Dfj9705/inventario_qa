@@ -89,11 +89,11 @@ pipeline {
         withSonarQubeEnv('TEST SONAR') {
           bat """
           "%SONAR_SCANNER_HOME%\\bin\\sonar-scanner.bat" ^
-            -Dsonar.projectKey=PROYECTO-FINAL-QA ^
-            -Dsonar.projectName=\\"PROYECTO FINAL QA\\" ^
-            -Dsonar.sources=app,config,resources,routes ^
-            -Dsonar.exclusions=vendor/**,storage/**,node_modules/** ^
-            -Dsonar.php.coverage.reportPaths=storage/coverage/coverage.xml
+            -D"sonar.projectKey=PROYECTO-FINAL-QA" ^
+            -D"sonar.projectName=PROYECTO FINAL QA" ^
+            -D"sonar.sources=app,config,resources,routes" ^
+            -D"sonar.exclusions=vendor/**,storage/**,node_modules/**" ^
+            -D"sonar.php.coverage.reportPaths=storage/coverage/coverage.xml"
           """
         }
       }
